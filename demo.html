@@ -440,6 +440,196 @@
             left: 0;
             color: #667eea;
         }
+
+        /* Architecture Topology Styles */
+        .topology-container {
+            background: white;
+            padding: 2rem;
+            border-radius: 12px;
+            margin: 2rem 0;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .topology-layer {
+            margin: 2rem 0;
+            padding: 1.5rem;
+            background: linear-gradient(135deg, #f5f7fa 0%, #e9ecef 100%);
+            border-radius: 8px;
+            position: relative;
+        }
+
+        .topology-layer-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #667eea;
+            margin-bottom: 1rem;
+            text-align: center;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .topology-nodes {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .topology-node {
+            background: white;
+            border: 3px solid #667eea;
+            border-radius: 12px;
+            padding: 1.5rem;
+            min-width: 140px;
+            text-align: center;
+            position: relative;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .topology-node:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 16px rgba(102, 126, 234, 0.3);
+            border-color: #5568d3;
+        }
+
+        .topology-node.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-color: #764ba2;
+            animation: pulse-node 2s infinite;
+        }
+
+        @keyframes pulse-node {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(102, 126, 234, 0.7); }
+            50% { box-shadow: 0 0 0 10px rgba(102, 126, 234, 0); }
+        }
+
+        .topology-node-icon {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .topology-node-title {
+            font-weight: 600;
+            font-size: 0.9rem;
+            margin-bottom: 0.3rem;
+        }
+
+        .topology-node-desc {
+            font-size: 0.75rem;
+            color: #666;
+            opacity: 0.8;
+        }
+
+        .topology-node.active .topology-node-desc {
+            color: white;
+            opacity: 0.9;
+        }
+
+        .topology-connection {
+            position: absolute;
+            height: 3px;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            transform-origin: left center;
+            opacity: 0.5;
+            z-index: 0;
+        }
+
+        .topology-connection.active {
+            opacity: 1;
+            animation: flow 2s linear infinite;
+            background: linear-gradient(90deg,
+                #667eea 0%,
+                #764ba2 25%,
+                #667eea 50%,
+                #764ba2 75%,
+                #667eea 100%);
+            background-size: 200% 100%;
+        }
+
+        @keyframes flow {
+            0% { background-position: 0% 0%; }
+            100% { background-position: 200% 0%; }
+        }
+
+        .topology-arrow {
+            width: 0;
+            height: 0;
+            border-left: 10px solid transparent;
+            border-right: 10px solid transparent;
+            border-top: 15px solid #667eea;
+            margin: 0.5rem auto;
+            opacity: 0.5;
+        }
+
+        .topology-arrow.active {
+            opacity: 1;
+            animation: bounce 1s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .topology-info {
+            background: #f9fafb;
+            border-left: 4px solid #667eea;
+            padding: 1rem;
+            margin-top: 1.5rem;
+            border-radius: 4px;
+            display: none;
+        }
+
+        .topology-info.show {
+            display: block;
+            animation: slideIn 0.3s ease-out;
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(-20px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        .topology-controls {
+            text-align: center;
+            margin: 1.5rem 0;
+        }
+
+        .topology-legend {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin: 1.5rem 0;
+            flex-wrap: wrap;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.85rem;
+        }
+
+        .legend-box {
+            width: 20px;
+            height: 20px;
+            border-radius: 4px;
+        }
+
+        .data-flow-indicator {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #22c55e;
+            margin-left: 0.5rem;
+            animation: pulse 1.5s infinite;
+        }
     </style>
 </head>
 <body>
@@ -459,6 +649,173 @@
         <!-- Architecture Section -->
         <div class="section">
             <h2>📐 System Architecture</h2>
+
+            <!-- Interactive Topology -->
+            <div class="topology-container">
+                <h3 style="text-align: center; color: #667eea; margin-bottom: 2rem;">
+                    🏗️ Interactive System Topology
+                </h3>
+
+                <div class="topology-controls">
+                    <button class="btn btn-primary" onclick="animateTopology()">
+                        ▶️ Animate Data Flow
+                    </button>
+                    <button class="btn btn-secondary" onclick="resetTopology()">
+                        🔄 Reset
+                    </button>
+                </div>
+
+                <div class="topology-legend">
+                    <div class="legend-item">
+                        <div class="legend-box" style="background: #667eea;"></div>
+                        <span>Core Components</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-box" style="background: #22c55e;"></div>
+                        <span>Data Processing</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-box" style="background: #f59e0b;"></div>
+                        <span>External Systems</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-box" style="background: linear-gradient(90deg, #667eea, #764ba2);"></div>
+                        <span>Data Flow</span>
+                    </div>
+                </div>
+
+                <!-- Layer 1: User Interface -->
+                <div class="topology-layer">
+                    <div class="topology-layer-title">📱 User Interface Layer</div>
+                    <div class="topology-nodes">
+                        <div class="topology-node" id="node-cli" onclick="showNodeInfo('cli')">
+                            <div class="topology-node-icon">💻</div>
+                            <div class="topology-node-title">CLI</div>
+                            <div class="topology-node-desc">Command Line</div>
+                        </div>
+                        <div class="topology-node" id="node-dashboard" onclick="showNodeInfo('dashboard')">
+                            <div class="topology-node-icon">🌐</div>
+                            <div class="topology-node-title">Web Dashboard</div>
+                            <div class="topology-node-desc">Flask + Chart.js</div>
+                        </div>
+                        <div class="topology-node" id="node-api" onclick="showNodeInfo('api')">
+                            <div class="topology-node-icon">🔌</div>
+                            <div class="topology-node-title">REST API</div>
+                            <div class="topology-node-desc">HTTP Endpoints</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="topology-arrow"></div>
+
+                <!-- Layer 2: Core Agent -->
+                <div class="topology-layer">
+                    <div class="topology-layer-title">🤖 AI Agent Layer</div>
+                    <div class="topology-nodes">
+                        <div class="topology-node" id="node-planner" onclick="showNodeInfo('planner')" style="border-color: #22c55e;">
+                            <div class="topology-node-icon">🎯</div>
+                            <div class="topology-node-title">Test Planner</div>
+                            <div class="topology-node-desc">AI Design</div>
+                        </div>
+                        <div class="topology-node" id="node-executor" onclick="showNodeInfo('executor')" style="border-color: #22c55e;">
+                            <div class="topology-node-icon">⚡</div>
+                            <div class="topology-node-title">Executor</div>
+                            <div class="topology-node-desc">Test Runner</div>
+                        </div>
+                        <div class="topology-node" id="node-analyzer" onclick="showNodeInfo('analyzer')" style="border-color: #22c55e;">
+                            <div class="topology-node-icon">📊</div>
+                            <div class="topology-node-title">Analyzer</div>
+                            <div class="topology-node-desc">AI Analysis</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="topology-arrow"></div>
+
+                <!-- Layer 3: Processing & ML -->
+                <div class="topology-layer">
+                    <div class="topology-layer-title">🧠 Intelligence & Processing</div>
+                    <div class="topology-nodes">
+                        <div class="topology-node" id="node-parsers" onclick="showNodeInfo('parsers')" style="border-color: #22c55e;">
+                            <div class="topology-node-icon">🔍</div>
+                            <div class="topology-node-title">Parsers</div>
+                            <div class="topology-node-desc">6 Specialized</div>
+                        </div>
+                        <div class="topology-node" id="node-ml" onclick="showNodeInfo('ml')" style="border-color: #22c55e;">
+                            <div class="topology-node-icon">🤖</div>
+                            <div class="topology-node-title">ML Engine</div>
+                            <div class="topology-node-desc">Anomaly Detection</div>
+                        </div>
+                        <div class="topology-node" id="node-metrics" onclick="showNodeInfo('metrics')" style="border-color: #22c55e;">
+                            <div class="topology-node-icon">📈</div>
+                            <div class="topology-node-title">Metrics</div>
+                            <div class="topology-node-desc">Collector</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="topology-arrow"></div>
+
+                <!-- Layer 4: Distributed & Storage -->
+                <div class="topology-layer">
+                    <div class="topology-layer-title">🌍 Distribution & Persistence</div>
+                    <div class="topology-nodes">
+                        <div class="topology-node" id="node-coordinator" onclick="showNodeInfo('coordinator')">
+                            <div class="topology-node-icon">🎛️</div>
+                            <div class="topology-node-title">Coordinator</div>
+                            <div class="topology-node-desc">Distributed</div>
+                        </div>
+                        <div class="topology-node" id="node-workers" onclick="showNodeInfo('workers')">
+                            <div class="topology-node-icon">👷</div>
+                            <div class="topology-node-title">Workers</div>
+                            <div class="topology-node-desc">Test Nodes</div>
+                        </div>
+                        <div class="topology-node" id="node-database" onclick="showNodeInfo('database')">
+                            <div class="topology-node-icon">🗄️</div>
+                            <div class="topology-node-title">Database</div>
+                            <div class="topology-node-desc">SQLite History</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="topology-arrow"></div>
+
+                <!-- Layer 5: External Integrations -->
+                <div class="topology-layer">
+                    <div class="topology-layer-title">🔗 External Integrations</div>
+                    <div class="topology-nodes">
+                        <div class="topology-node" id="node-llm" onclick="showNodeInfo('llm')" style="border-color: #f59e0b;">
+                            <div class="topology-node-icon">🧠</div>
+                            <div class="topology-node-title">LLM APIs</div>
+                            <div class="topology-node-desc">GPT-4 / Claude</div>
+                        </div>
+                        <div class="topology-node" id="node-prometheus" onclick="showNodeInfo('prometheus')" style="border-color: #f59e0b;">
+                            <div class="topology-node-icon">📊</div>
+                            <div class="topology-node-title">Prometheus</div>
+                            <div class="topology-node-desc">Metrics Export</div>
+                        </div>
+                        <div class="topology-node" id="node-alerts" onclick="showNodeInfo('alerts')" style="border-color: #f59e0b;">
+                            <div class="topology-node-icon">🚨</div>
+                            <div class="topology-node-title">Alerts</div>
+                            <div class="topology-node-desc">Slack/PagerDuty</div>
+                        </div>
+                        <div class="topology-node" id="node-cicd" onclick="showNodeInfo('cicd')" style="border-color: #f59e0b;">
+                            <div class="topology-node-icon">🔄</div>
+                            <div class="topology-node-title">CI/CD</div>
+                            <div class="topology-node-desc">GitHub/Jenkins</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Info Panel -->
+                <div id="topology-info" class="topology-info">
+                    <h4 id="topology-info-title" style="color: #667eea; margin-bottom: 0.5rem;"></h4>
+                    <p id="topology-info-desc"></p>
+                    <div id="topology-info-details"></div>
+                </div>
+            </div>
+
+            <h3 style="margin-top: 3rem; color: #667eea;">Component Details</h3>
             <div class="architecture">
                 <div class="arch-box">
                     <h3>🤖 Core Agent (Phase 1)</h3>
@@ -1104,6 +1461,287 @@ Click "Train Model" to begin or "Detect Anomalies" to test...</span>
             ];
 
             await streamOutput(terminal, output, 150);
+        }
+
+        // Topology Functions
+        const nodeInfo = {
+            'cli': {
+                title: '💻 Command Line Interface',
+                desc: 'Primary interface for running tests via terminal commands',
+                details: `
+                    <ul style="margin-top: 0.5rem; padding-left: 1.5rem;">
+                        <li>Natural language test requirements</li>
+                        <li>Full workflow execution</li>
+                        <li>Streaming output support</li>
+                        <li>Progress indicators</li>
+                        <li>Rich formatted results</li>
+                    </ul>
+                `
+            },
+            'dashboard': {
+                title: '🌐 Web Dashboard',
+                desc: 'Real-time monitoring and visualization interface',
+                details: `
+                    <ul style="margin-top: 0.5rem; padding-left: 1.5rem;">
+                        <li>Flask-based REST API backend</li>
+                        <li>Chart.js interactive visualizations</li>
+                        <li>Auto-refresh every 30 seconds</li>
+                        <li>Historical data display</li>
+                        <li>Test results table</li>
+                    </ul>
+                `
+            },
+            'api': {
+                title: '🔌 REST API',
+                desc: 'HTTP API for programmatic access',
+                details: `
+                    <ul style="margin-top: 0.5rem; padding-left: 1.5rem;">
+                        <li>RESTful endpoints for all operations</li>
+                        <li>JSON request/response format</li>
+                        <li>Authentication support</li>
+                        <li>Rate limiting</li>
+                        <li>API documentation (OpenAPI)</li>
+                    </ul>
+                `
+            },
+            'planner': {
+                title: '🎯 Test Planner',
+                desc: 'AI-powered test case designer using LLMs',
+                details: `
+                    <ul style="margin-top: 0.5rem; padding-left: 1.5rem;">
+                        <li>GPT-4 / Claude integration</li>
+                        <li>Natural language processing</li>
+                        <li>Test suite catalog (34 suites)</li>
+                        <li>Intelligent test selection</li>
+                        <li>Parameter optimization</li>
+                    </ul>
+                `
+            },
+            'executor': {
+                title: '⚡ Test Executor',
+                desc: 'Runs tests on local or distributed systems',
+                details: `
+                    <ul style="margin-top: 0.5rem; padding-left: 1.5rem;">
+                        <li>Multi-suite support (rt-tests, stress-ng, etc.)</li>
+                        <li>Distributed execution capable</li>
+                        <li>Real-time output capture</li>
+                        <li>Timeout handling</li>
+                        <li>Error recovery</li>
+                    </ul>
+                `
+            },
+            'analyzer': {
+                title: '📊 Result Analyzer',
+                desc: 'AI-powered analysis and insights generation',
+                details: `
+                    <ul style="margin-top: 0.5rem; padding-left: 1.5rem;">
+                        <li>Performance rating (0-100)</li>
+                        <li>Bottleneck identification</li>
+                        <li>AI-generated recommendations</li>
+                        <li>Baseline comparison</li>
+                        <li>Trend analysis</li>
+                    </ul>
+                `
+            },
+            'parsers': {
+                title: '🔍 Specialized Parsers',
+                desc: '6 parsers for different test suite outputs',
+                details: `
+                    <ul style="margin-top: 0.5rem; padding-left: 1.5rem;">
+                        <li>RTTestsParser (cyclictest)</li>
+                        <li>StressNGParser (stress-ng)</li>
+                        <li>NetworkParser (iperf3/netperf/qperf)</li>
+                        <li>IOParser (fio/iozone)</li>
+                        <li>MemoryParser (STREAM/memtester)</li>
+                        <li>BenchmarkParser (UnixBench/lmbench)</li>
+                    </ul>
+                `
+            },
+            'ml': {
+                title: '🤖 ML Anomaly Detection',
+                desc: 'Machine learning-based performance anomaly detection',
+                details: `
+                    <ul style="margin-top: 0.5rem; padding-left: 1.5rem;">
+                        <li>Isolation Forest algorithm</li>
+                        <li>Statistical methods (Z-score, IQR)</li>
+                        <li>Time-series analysis</li>
+                        <li>&lt;50ms detection latency</li>
+                        <li>Model training & persistence</li>
+                    </ul>
+                `
+            },
+            'metrics': {
+                title: '📈 Metrics Collector',
+                desc: 'Aggregates and analyzes performance metrics',
+                details: `
+                    <ul style="margin-top: 0.5rem; padding-left: 1.5rem;">
+                        <li>Statistical analysis (mean, median, stdev)</li>
+                        <li>Percentile calculations (P50-P99.9)</li>
+                        <li>Baseline comparison</li>
+                        <li>Category & tag filtering</li>
+                        <li>Export to JSON/Prometheus</li>
+                    </ul>
+                `
+            },
+            'coordinator': {
+                title: '🎛️ Distributed Coordinator',
+                desc: 'Orchestrates distributed test execution',
+                details: `
+                    <ul style="margin-top: 0.5rem; padding-left: 1.5rem;">
+                        <li>Worker registration & management</li>
+                        <li>Test distribution (round-robin)</li>
+                        <li>Result aggregation</li>
+                        <li>Auto-scaling support</li>
+                        <li>Health monitoring</li>
+                    </ul>
+                `
+            },
+            'workers': {
+                title: '👷 Test Workers',
+                desc: 'Remote test execution nodes',
+                details: `
+                    <ul style="margin-top: 0.5rem; padding-left: 1.5rem;">
+                        <li>Capability reporting</li>
+                        <li>Independent test execution</li>
+                        <li>Heartbeat monitoring</li>
+                        <li>Resource tracking</li>
+                        <li>Dynamic scaling (4-50+ workers)</li>
+                    </ul>
+                `
+            },
+            'database': {
+                title: '🗄️ SQLite Database',
+                desc: 'Historical data storage and retrieval',
+                details: `
+                    <ul style="margin-top: 0.5rem; padding-left: 1.5rem;">
+                        <li>Test run history</li>
+                        <li>Metrics time-series data</li>
+                        <li>Baseline storage</li>
+                        <li>Indexed queries for performance</li>
+                        <li>Export capabilities</li>
+                    </ul>
+                `
+            },
+            'llm': {
+                title: '🧠 LLM APIs',
+                desc: 'External AI model integrations',
+                details: `
+                    <ul style="margin-top: 0.5rem; padding-left: 1.5rem;">
+                        <li>OpenAI GPT-4 support</li>
+                        <li>Anthropic Claude support</li>
+                        <li>Local model support (Ollama)</li>
+                        <li>Fallback mode when unavailable</li>
+                        <li>Rate limiting & retry logic</li>
+                    </ul>
+                `
+            },
+            'prometheus': {
+                title: '📊 Prometheus Integration',
+                desc: 'Metrics export to Prometheus',
+                details: `
+                    <ul style="margin-top: 0.5rem; padding-left: 1.5rem;">
+                        <li>HTTP metrics endpoint (:9090/metrics)</li>
+                        <li>Gauge, counter, histogram support</li>
+                        <li>Label-based metrics</li>
+                        <li>10k+ metrics/sec throughput</li>
+                        <li>Grafana dashboard auto-generation</li>
+                    </ul>
+                `
+            },
+            'alerts': {
+                title: '🚨 Alert System',
+                desc: 'Multi-channel notification system',
+                details: `
+                    <ul style="margin-top: 0.5rem; padding-left: 1.5rem;">
+                        <li>Slack integration (rich formatting)</li>
+                        <li>PagerDuty incident creation</li>
+                        <li>Email notifications (HTML)</li>
+                        <li>Webhook support</li>
+                        <li>Rule-based engine with cooldowns</li>
+                    </ul>
+                `
+            },
+            'cicd': {
+                title: '🔄 CI/CD Integration',
+                desc: 'Automated testing in CI/CD pipelines',
+                details: `
+                    <ul style="margin-top: 0.5rem; padding-left: 1.5rem;">
+                        <li>GitHub Actions workflows</li>
+                        <li>Jenkins pipelines (Jenkinsfile)</li>
+                        <li>GitLab CI configuration</li>
+                        <li>Auto-generated configs</li>
+                        <li>PR/MR comment posting</li>
+                    </ul>
+                `
+            }
+        };
+
+        function showNodeInfo(nodeId) {
+            const info = nodeInfo[nodeId];
+            if (!info) return;
+
+            const infoPanel = document.getElementById('topology-info');
+            const titleEl = document.getElementById('topology-info-title');
+            const descEl = document.getElementById('topology-info-desc');
+            const detailsEl = document.getElementById('topology-info-details');
+
+            titleEl.textContent = info.title;
+            descEl.textContent = info.desc;
+            detailsEl.innerHTML = info.details;
+
+            infoPanel.classList.add('show');
+
+            // Highlight node
+            document.querySelectorAll('.topology-node').forEach(node => {
+                node.style.background = 'white';
+                node.style.color = '#333';
+            });
+
+            const node = document.getElementById('node-' + nodeId);
+            if (node) {
+                node.style.background = 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)';
+                node.style.color = 'white';
+                node.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+        }
+
+        async function animateTopology() {
+            const nodes = [
+                'cli', 'planner', 'executor', 'parsers', 'ml', 'metrics',
+                'coordinator', 'workers', 'database', 'analyzer',
+                'llm', 'prometheus', 'alerts'
+            ];
+
+            const arrows = document.querySelectorAll('.topology-arrow');
+
+            for (let i = 0; i < nodes.length; i++) {
+                const node = document.getElementById('node-' + nodes[i]);
+                if (node) {
+                    node.classList.add('active');
+
+                    if (i < arrows.length) {
+                        arrows[i].classList.add('active');
+                    }
+
+                    await new Promise(resolve => setTimeout(resolve, 500));
+                }
+            }
+
+            setTimeout(() => resetTopology(), 2000);
+        }
+
+        function resetTopology() {
+            document.querySelectorAll('.topology-node').forEach(node => {
+                node.classList.remove('active');
+                node.style.background = 'white';
+                node.style.color = '#333';
+            });
+
+            document.querySelectorAll('.topology-arrow').forEach(arrow => {
+                arrow.classList.remove('active');
+            });
+
+            document.getElementById('topology-info').classList.remove('show');
         }
 
         // Helper functions
