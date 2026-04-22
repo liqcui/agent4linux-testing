@@ -108,10 +108,15 @@ class LLMClient:
     ) -> str:
         """Generate using OpenAI API."""
         try:
-            response = self._client.ChatCompletion.create(
+            # Use the new OpenAI client format (v1.0+)
+            from openai import OpenAI
+
+            client = OpenAI(api_key=self.api_key)
+
+            response = client.chat.completions.create(
                 model=self.model,
                 messages=[
-                    {"role": "system", "content": "You are a Linux testing expert."},
+                    {"role": "system", "content": "You are an expert Linux performance testing and benchmarking assistant with deep knowledge of system performance analysis, real-time testing, and optimization strategies."},
                     {"role": "user", "content": prompt}
                 ],
                 temperature=temperature,

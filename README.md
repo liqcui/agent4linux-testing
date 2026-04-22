@@ -18,6 +18,10 @@ Agent4Linux-Testing is an AI-powered testing assistant that helps you:
 - 🎯 **Automated Testing**: Integrates with linux-testing suite for comprehensive coverage
 - 📈 **Performance Insights**: Provides actionable optimization recommendations
 - 🔄 **Continuous Learning**: Improves test strategies based on historical data
+- 📉 **Advanced Metrics**: Collects and analyzes detailed metrics with percentile calculations
+- 📊 **Rich Visualizations**: Creates charts, graphs, and dashboards for metrics
+- 🔍 **Regression Detection**: Automatically compares with baselines and detects regressions
+- 🧩 **Multi-Parser Support**: Specialized parsers for 6+ test suite types (rt-tests, stress-ng, iperf3, fio, STREAM, UnixBench, etc.)
 
 ## Architecture
 
@@ -322,30 +326,38 @@ Contributions are welcome! Please:
 
 ## Roadmap
 
-- [ ] Phase 1: Core agent implementation
+- [x] **Phase 1: Core agent implementation**
   - [x] Project structure
-  - [ ] LLM integration
-  - [ ] Test planner
-  - [ ] Test executor
-  - [ ] Result analyzer
+  - [x] LLM integration
+  - [x] Test planner
+  - [x] Test executor
+  - [x] Result analyzer
+  - [x] Report generator
 
-- [ ] Phase 2: Advanced features
-  - [ ] Multi-LLM support (OpenAI, Anthropic, local models)
-  - [ ] Historical data analysis
-  - [ ] Predictive performance modeling
-  - [ ] Automated regression detection
+- [x] **Phase 2: Advanced features** ✅ **COMPLETED**
+  - [x] Multi-LLM support (OpenAI, Anthropic, local models)
+  - [x] Advanced test suite parsers (6 specialized parsers)
+  - [x] Enhanced metrics collection and aggregation
+  - [x] Statistical analysis with percentiles (P50, P90, P95, P99, P99.9)
+  - [x] Baseline comparison and regression detection
+  - [x] Metrics visualization (charts, graphs, dashboards)
+  - [x] Full LLM API integration (OpenAI & Anthropic)
+
+  **See [PHASE2_FEATURES.md](PHASE2_FEATURES.md) for detailed documentation.**
 
 - [ ] Phase 3: UI/UX
   - [ ] Web dashboard
   - [ ] Interactive test designer
   - [ ] Real-time monitoring
   - [ ] Collaborative features
+  - [ ] Historical trend analysis
 
 - [ ] Phase 4: Enterprise features
   - [ ] Multi-system testing
   - [ ] Distributed execution
   - [ ] Advanced reporting
   - [ ] CI/CD integration
+  - [ ] Machine learning-based anomaly detection
 
 ## License
 

@@ -5,6 +5,10 @@ Report Generator - Creates comprehensive test reports.
 from typing import Dict, Any, Optional
 from datetime import datetime
 import json
+import os
+
+# Import visualizer
+from utils import MetricsVisualizer
 
 
 class ReportGenerator:
@@ -13,6 +17,10 @@ class ReportGenerator:
 
     Supports HTML, PDF, Markdown, and JSON formats.
     """
+
+    def __init__(self):
+        """Initialize report generator."""
+        self.visualizer = MetricsVisualizer()
 
     def generate(
         self,

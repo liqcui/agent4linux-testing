@@ -8,6 +8,16 @@ import json
 from typing import Dict, List, Optional, Any
 from datetime import datetime
 
+# Import parsers
+from integrations import (
+    RTTestsParser,
+    StressNGParser,
+    NetworkParser,
+    IOParser,
+    MemoryParser,
+    BenchmarkParser
+)
+
 
 class TestExecutor:
     """
@@ -26,6 +36,22 @@ class TestExecutor:
         self.linux_testing_path = linux_testing_path or self._detect_linux_testing_path()
         self.results_dir = "./test_results"
         os.makedirs(self.results_dir, exist_ok=True)
+
+        # Initialize parsers
+        self.parsers = {
+            "rt-tests": RTTestsParser(),
+            "cyclictest": RTTestsParser(),
+            "stress-ng": StressNGParser(),
+            "iperf3": NetworkParser(),
+            "netperf": NetworkParser(),
+            "qperf": NetworkParser(),
+            "fio": IOParser(),
+            "iozone": IOParser(),
+            "stream": MemoryParser(),
+            "memtester": MemoryParser(),
+            "unixbench": BenchmarkParser(),
+            "lmbench": BenchmarkParser()
+        }
 
     def _detect_linux_testing_path(self) -> Optional[str]:
         """
@@ -245,7 +271,7 @@ class TestExecutor:
 
     def _parse_metrics(self, suite: str, output: str) -> Dict[str, Any]:
         """
-        Parse metrics from test output.
+        Parse metrics from test output using advanced parsers.
 
         Args:
             suite: Test suite name
@@ -254,6 +280,17 @@ class TestExecutor:
         Returns:
             Dictionary of parsed metrics
         """
+        # Use advanced parser if available
+        parser = self.parsers.get(suite.lower())
+        if parser:
+            try:
+                return parser.parse(output)
+            except Exception as e:
+                print(f"Warning: Parser failed for {suite}: {e}")
+                # Fall back to basic parsing
+                pass
+
+        # Basic fallback parsing
         metrics = {}
 
         # Suite-specific parsers
