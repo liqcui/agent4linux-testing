@@ -1,0 +1,1128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agent4Linux-Testing - Interactive Demo</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #333;
+            overflow-x: hidden;
+        }
+
+        .hero {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 4rem 2rem;
+            text-align: center;
+        }
+
+        .hero h1 {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .hero p {
+            font-size: 1.3rem;
+            opacity: 0.95;
+            max-width: 800px;
+            margin: 0 auto 2rem;
+        }
+
+        .badge {
+            display: inline-block;
+            background: rgba(255,255,255,0.2);
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            margin: 0.3rem;
+            font-size: 0.9rem;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .section {
+            background: white;
+            margin: 2rem 0;
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        .section h2 {
+            color: #667eea;
+            margin-bottom: 1.5rem;
+            font-size: 2rem;
+            border-bottom: 3px solid #667eea;
+            padding-bottom: 0.5rem;
+        }
+
+        .architecture {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+
+        .arch-box {
+            background: linear-gradient(135deg, #f5f7fa 0%, #e9ecef 100%);
+            padding: 1.5rem;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+            transition: transform 0.3s;
+        }
+
+        .arch-box:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+        }
+
+        .arch-box h3 {
+            color: #667eea;
+            margin-bottom: 0.8rem;
+            font-size: 1.2rem;
+        }
+
+        .arch-box ul {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .arch-box li {
+            padding: 0.3rem 0;
+            padding-left: 1.5rem;
+            position: relative;
+        }
+
+        .arch-box li:before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            color: #22c55e;
+            font-weight: bold;
+        }
+
+        .demo-tabs {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1rem;
+            border-bottom: 2px solid #e5e7eb;
+        }
+
+        .demo-tab {
+            padding: 1rem 2rem;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            color: #666;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s;
+        }
+
+        .demo-tab:hover {
+            color: #667eea;
+        }
+
+        .demo-tab.active {
+            color: #667eea;
+            border-bottom-color: #667eea;
+        }
+
+        .demo-content {
+            display: none;
+        }
+
+        .demo-content.active {
+            display: block;
+        }
+
+        .terminal {
+            background: #1e1e1e;
+            color: #d4d4d4;
+            padding: 1.5rem;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            min-height: 400px;
+            overflow-y: auto;
+            position: relative;
+        }
+
+        .terminal-header {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid #333;
+        }
+
+        .terminal-btn {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+        }
+
+        .terminal-btn.red { background: #ff5f56; }
+        .terminal-btn.yellow { background: #ffbd2e; }
+        .terminal-btn.green { background: #27c93f; }
+
+        .terminal-output {
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+
+        .prompt {
+            color: #22c55e;
+        }
+
+        .command {
+            color: #61dafb;
+        }
+
+        .success {
+            color: #22c55e;
+        }
+
+        .error {
+            color: #ef4444;
+        }
+
+        .warning {
+            color: #fbbf24;
+        }
+
+        .info {
+            color: #3b82f6;
+        }
+
+        .dashboard-preview {
+            background: #f5f7fa;
+            padding: 1.5rem;
+            border-radius: 8px;
+            min-height: 500px;
+        }
+
+        .stat-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            transition: transform 0.3s;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        }
+
+        .stat-label {
+            font-size: 0.85rem;
+            color: #666;
+            text-transform: uppercase;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #667eea;
+        }
+
+        .chart-container {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 1.5rem;
+        }
+
+        .chart-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: #333;
+        }
+
+        .controls {
+            margin: 1.5rem 0;
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 6px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #5568d3;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #5a6268;
+        }
+
+        .btn-success {
+            background: #22c55e;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #16a34a;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 6px;
+            background: #e5e7eb;
+            border-radius: 3px;
+            overflow: hidden;
+            margin: 1rem 0;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        .status-indicator {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            margin-right: 0.5rem;
+            animation: pulse 2s infinite;
+        }
+
+        .status-indicator.green {
+            background: #22c55e;
+            box-shadow: 0 0 8px #22c55e;
+        }
+
+        .status-indicator.red {
+            background: #ef4444;
+            box-shadow: 0 0 8px #ef4444;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .cursor {
+            display: inline-block;
+            width: 8px;
+            height: 16px;
+            background: #22c55e;
+            animation: blink 1s infinite;
+        }
+
+        @keyframes blink {
+            0%, 50% { opacity: 1; }
+            51%, 100% { opacity: 0; }
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin: 2rem 0;
+        }
+
+        .feature-card {
+            background: linear-gradient(135deg, #f5f7fa 0%, #e9ecef 100%);
+            padding: 2rem;
+            border-radius: 12px;
+            border-top: 4px solid #667eea;
+        }
+
+        .feature-icon {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .feature-card h3 {
+            color: #667eea;
+            margin-bottom: 1rem;
+            font-size: 1.3rem;
+        }
+
+        .metrics-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+        }
+
+        .metrics-table th,
+        .metrics-table td {
+            padding: 0.75rem;
+            text-align: left;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .metrics-table th {
+            background: #f5f7fa;
+            font-weight: 600;
+            color: #667eea;
+        }
+
+        .metrics-table tr:hover {
+            background: #f9fafb;
+        }
+
+        canvas {
+            max-width: 100%;
+            height: 250px;
+        }
+
+        .footer {
+            background: #1e1e1e;
+            color: white;
+            padding: 2rem;
+            text-align: center;
+            margin-top: 3rem;
+        }
+
+        .streaming-output {
+            min-height: 50px;
+        }
+
+        .log-line {
+            margin: 0.2rem 0;
+            padding-left: 1rem;
+            position: relative;
+        }
+
+        .log-line:before {
+            content: "▸";
+            position: absolute;
+            left: 0;
+            color: #667eea;
+        }
+    </style>
+</head>
+<body>
+    <!-- Hero Section -->
+    <div class="hero">
+        <h1>🚀 Agent4Linux-Testing</h1>
+        <p>Enterprise-Grade AI-Powered Linux Performance Testing Framework</p>
+        <div>
+            <span class="badge">✅ Phase 1: Core AI Agent</span>
+            <span class="badge">✅ Phase 2: Advanced Metrics</span>
+            <span class="badge">✅ Phase 3: Production Features</span>
+            <span class="badge">✅ Phase 4: Enterprise Features</span>
+        </div>
+    </div>
+
+    <div class="container">
+        <!-- Architecture Section -->
+        <div class="section">
+            <h2>📐 System Architecture</h2>
+            <div class="architecture">
+                <div class="arch-box">
+                    <h3>🤖 Core Agent (Phase 1)</h3>
+                    <ul>
+                        <li>AI-Powered Test Design</li>
+                        <li>Test Executor</li>
+                        <li>Result Analyzer</li>
+                        <li>Report Generator</li>
+                        <li>CLI Interface</li>
+                    </ul>
+                </div>
+                <div class="arch-box">
+                    <h3>📊 Advanced Features (Phase 2)</h3>
+                    <ul>
+                        <li>6 Specialized Parsers</li>
+                        <li>Metrics Collection</li>
+                        <li>Percentile Analysis</li>
+                        <li>Regression Detection</li>
+                        <li>Visualization</li>
+                    </ul>
+                </div>
+                <div class="arch-box">
+                    <h3>🌐 Production (Phase 3)</h3>
+                    <ul>
+                        <li>Web Dashboard</li>
+                        <li>Historical Tracking</li>
+                        <li>CI/CD Integration</li>
+                        <li>Real-time Monitoring</li>
+                        <li>Baseline Management</li>
+                    </ul>
+                </div>
+                <div class="arch-box">
+                    <h3>🏢 Enterprise (Phase 4)</h3>
+                    <ul>
+                        <li>Distributed Testing</li>
+                        <li>ML Anomaly Detection</li>
+                        <li>Advanced Alerting</li>
+                        <li>Prometheus/Grafana</li>
+                        <li>Auto-scaling</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Key Features -->
+        <div class="section">
+            <h2>✨ Key Features</h2>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">🤖</div>
+                    <h3>AI-Powered Design</h3>
+                    <p>Natural language test requirements transformed into comprehensive test plans using GPT-4 or Claude.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🌍</div>
+                    <h3>Distributed Testing</h3>
+                    <p>Multi-system test coordination with worker pools for 10x performance improvement.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🎯</div>
+                    <h3>ML Anomaly Detection</h3>
+                    <p>Isolation Forest, statistical, and time-series analysis with <50ms detection latency.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🚨</div>
+                    <h3>Advanced Alerting</h3>
+                    <p>Slack, PagerDuty, Email notifications with flexible rule-based engine.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">📈</div>
+                    <h3>Prometheus & Grafana</h3>
+                    <p>Metrics export and auto-generated dashboards for comprehensive monitoring.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🔄</div>
+                    <h3>CI/CD Integration</h3>
+                    <p>Auto-generated pipelines for GitHub Actions, Jenkins, and GitLab CI.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Interactive Demo -->
+        <div class="section">
+            <h2>🎮 Interactive Demo</h2>
+
+            <div class="demo-tabs">
+                <button class="demo-tab active" onclick="showDemo('cli')">CLI Demo</button>
+                <button class="demo-tab" onclick="showDemo('dashboard')">Web Dashboard</button>
+                <button class="demo-tab" onclick="showDemo('distributed')">Distributed Testing</button>
+                <button class="demo-tab" onclick="showDemo('ml')">ML Anomaly Detection</button>
+            </div>
+
+            <!-- CLI Demo -->
+            <div id="cli-demo" class="demo-content active">
+                <div class="controls">
+                    <button class="btn btn-primary" onclick="runCLIDemo()">
+                        ▶️ Run Test
+                    </button>
+                    <button class="btn btn-secondary" onclick="clearTerminal('cli-terminal')">
+                        🗑️ Clear
+                    </button>
+                    <button class="btn btn-success" onclick="runFullWorkflow()">
+                        🔄 Full Workflow
+                    </button>
+                </div>
+                <div class="progress-bar">
+                    <div id="cli-progress" class="progress-fill"></div>
+                </div>
+                <div class="terminal">
+                    <div class="terminal-header">
+                        <div class="terminal-btn red"></div>
+                        <div class="terminal-btn yellow"></div>
+                        <div class="terminal-btn green"></div>
+                    </div>
+                    <div id="cli-terminal" class="terminal-output">
+<span class="prompt">$</span> <span class="command">python -m agent4linux --help</span>
+
+<span class="info">Agent4Linux-Testing v2.0.0
+AI-Powered Linux Performance Testing Framework
+
+Usage:
+  python -m agent4linux run --requirement "Your test requirement"
+  python -m agent4linux design --requirement "Test requirement"
+  python -m agent4linux execute --plan test_plan.json
+  python -m agent4linux analyze --results results.json
+
+Ready for demonstration. Click "Run Test" to start.</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Dashboard Demo -->
+            <div id="dashboard-demo" class="demo-content">
+                <div class="controls">
+                    <button class="btn btn-primary" onclick="refreshDashboard()">
+                        🔄 Refresh Data
+                    </button>
+                    <button class="btn btn-success" onclick="simulateTest()">
+                        ▶️ Simulate Test
+                    </button>
+                </div>
+                <div class="dashboard-preview">
+                    <div class="stat-cards">
+                        <div class="stat-card">
+                            <div class="stat-label">Total Tests</div>
+                            <div class="stat-value" id="total-tests">0</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-label">Latest Score</div>
+                            <div class="stat-value" id="latest-score">-</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-label">Avg Latency</div>
+                            <div class="stat-value" id="avg-latency">-</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-label">Pass Rate</div>
+                            <div class="stat-value" id="pass-rate">-</div>
+                        </div>
+                    </div>
+                    <div class="chart-container">
+                        <div class="chart-title">
+                            <span class="status-indicator green"></span>
+                            Latency Trend (Real-time)
+                        </div>
+                        <canvas id="latencyChart"></canvas>
+                    </div>
+                    <div class="chart-container">
+                        <div class="chart-title">Test Results</div>
+                        <table class="metrics-table">
+                            <thead>
+                                <tr>
+                                    <th>Test ID</th>
+                                    <th>Timestamp</th>
+                                    <th>Status</th>
+                                    <th>Score</th>
+                                </tr>
+                            </thead>
+                            <tbody id="test-results-table">
+                                <tr>
+                                    <td colspan="4" style="text-align: center; color: #666;">
+                                        Click "Simulate Test" to generate data
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Distributed Testing Demo -->
+            <div id="distributed-demo" class="demo-content">
+                <div class="controls">
+                    <button class="btn btn-primary" onclick="runDistributedTest()">
+                        🌍 Start Distributed Test
+                    </button>
+                    <button class="btn btn-secondary" onclick="clearTerminal('distributed-terminal')">
+                        🗑️ Clear
+                    </button>
+                </div>
+                <div class="progress-bar">
+                    <div id="distributed-progress" class="progress-fill"></div>
+                </div>
+                <div class="terminal">
+                    <div class="terminal-header">
+                        <div class="terminal-btn red"></div>
+                        <div class="terminal-btn yellow"></div>
+                        <div class="terminal-btn green"></div>
+                    </div>
+                    <div id="distributed-terminal" class="terminal-output">
+<span class="info">Distributed Testing System Ready
+
+Coordinator: localhost:8000
+Workers: 4 registered
+Scheduler: Active
+
+Click "Start Distributed Test" to begin...</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ML Demo -->
+            <div id="ml-demo" class="demo-content">
+                <div class="controls">
+                    <button class="btn btn-primary" onclick="runMLDetection()">
+                        🤖 Detect Anomalies
+                    </button>
+                    <button class="btn btn-success" onclick="trainMLModel()">
+                        📊 Train Model
+                    </button>
+                    <button class="btn btn-secondary" onclick="clearTerminal('ml-terminal')">
+                        🗑️ Clear
+                    </button>
+                </div>
+                <div class="terminal">
+                    <div class="terminal-header">
+                        <div class="terminal-btn red"></div>
+                        <div class="terminal-btn yellow"></div>
+                        <div class="terminal-btn green"></div>
+                    </div>
+                    <div id="ml-terminal" class="terminal-output">
+<span class="info">Machine Learning Anomaly Detection System
+
+Models Available:
+  - Isolation Forest
+  - Statistical (Z-score, IQR)
+  - Time-Series Analysis
+
+Click "Train Model" to begin or "Detect Anomalies" to test...</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="footer">
+        <p>Agent4Linux-Testing Framework v2.0.0</p>
+        <p>All Phases Complete | Production Ready | Enterprise Features</p>
+        <p style="margin-top: 1rem; opacity: 0.8;">
+            📊 8,800+ Lines of Code | 43 Python Modules | 4 Complete Phases
+        </p>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <script>
+        // Global state
+        let latencyChart = null;
+        let testData = [];
+        let latencyData = [];
+        let isStreaming = false;
+
+        // Initialize
+        window.addEventListener('load', () => {
+            initializeCharts();
+        });
+
+        function initializeCharts() {
+            const ctx = document.getElementById('latencyChart');
+            if (ctx && !latencyChart) {
+                latencyChart = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: [],
+                        datasets: [{
+                            label: 'Max Latency (μs)',
+                            data: [],
+                            borderColor: '#667eea',
+                            backgroundColor: 'rgba(102, 126, 234, 0.1)',
+                            tension: 0.4,
+                            fill: true
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { display: false }
+                        },
+                        scales: {
+                            y: { beginAtZero: true }
+                        }
+                    }
+                });
+            }
+        }
+
+        // Tab switching
+        function showDemo(demoType) {
+            document.querySelectorAll('.demo-tab').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('.demo-content').forEach(content => content.classList.remove('active'));
+
+            event.target.classList.add('active');
+            document.getElementById(demoType + '-demo').classList.add('active');
+        }
+
+        // Streaming output helper
+        async function streamOutput(terminal, lines, delay = 50) {
+            isStreaming = true;
+            for (let line of lines) {
+                if (!isStreaming) break;
+                await new Promise(resolve => setTimeout(resolve, delay));
+                terminal.innerHTML += line + '\n';
+                terminal.scrollTop = terminal.scrollHeight;
+            }
+            isStreaming = false;
+        }
+
+        // CLI Demo
+        async function runCLIDemo() {
+            const terminal = document.getElementById('cli-terminal');
+            const progress = document.getElementById('cli-progress');
+            clearTerminal('cli-terminal');
+
+            const output = [
+                '<span class="prompt">$</span> <span class="command">python -m agent4linux run --requirement "Test CPU and memory performance"</span>',
+                '',
+                '<span class="info">🚀 Agent4Linux-Testing v2.0.0</span>',
+                '<span class="info">━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━</span>',
+                '',
+                '<span class="log-line">Initializing AI agent...</span>',
+                '<span class="log-line success">✓ LLM client initialized (GPT-4)</span>',
+                '<span class="log-line">Designing test cases...</span>',
+            ];
+
+            await streamOutput(terminal, output, 100);
+            progress.style.width = '30%';
+
+            const designOutput = [
+                '<span class="log-line success">✓ Generated 4 test cases:</span>',
+                '  <span class="info">1. CPU Stress Test (stress-ng)</span>',
+                '  <span class="info">2. Memory Bandwidth (STREAM)</span>',
+                '  <span class="info">3. Memory Pattern Test (memtester)</span>',
+                '  <span class="info">4. System Benchmark (UnixBench)</span>',
+                '',
+                '<span class="log-line">Executing tests...</span>',
+            ];
+
+            await streamOutput(terminal, designOutput, 100);
+            progress.style.width = '50%';
+
+            const execOutput = [
+                '<span class="log-line">  → Running stress-ng (CPU)...</span>',
+                '<span class="log-line success">    ✓ Completed: 125000 bogo ops/s</span>',
+                '<span class="log-line">  → Running STREAM (Memory)...</span>',
+                '<span class="log-line success">    ✓ Completed: 18500 MB/s bandwidth</span>',
+                '<span class="log-line">  → Running memtester...</span>',
+                '<span class="log-line success">    ✓ All tests passed</span>',
+                '<span class="log-line">  → Running UnixBench...</span>',
+                '<span class="log-line success">    ✓ System Index: 2847.3</span>',
+                '',
+            ];
+
+            await streamOutput(terminal, execOutput, 150);
+            progress.style.width = '80%';
+
+            const analysisOutput = [
+                '<span class="log-line">Analyzing results with AI...</span>',
+                '<span class="log-line success">✓ Analysis complete</span>',
+                '',
+                '<span class="success">━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━</span>',
+                '<span class="success">📊 RESULTS SUMMARY</span>',
+                '<span class="success">━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━</span>',
+                '',
+                '<span class="info">Verdict: </span><span class="success">PASS ✓</span>',
+                '<span class="info">Score: </span><span class="success">87.5/100</span>',
+                '<span class="info">Duration: </span>180.5 seconds',
+                '',
+                '<span class="info">Key Metrics:</span>',
+                '  • Max Latency: 42.5 μs',
+                '  • Memory Bandwidth: 18500 MB/s',
+                '  • CPU Performance: 125000 ops/s',
+                '',
+                '<span class="log-line success">✓ Report generated: results/report.html</span>',
+                '<span class="log-line success">✓ Metrics exported to Prometheus</span>',
+                '<span class="log-line success">✓ Test data saved to history database</span>',
+                '',
+                '<span class="prompt">$</span> <span class="cursor"></span>'
+            ];
+
+            await streamOutput(terminal, analysisOutput, 80);
+            progress.style.width = '100%';
+        }
+
+        async function runFullWorkflow() {
+            const terminal = document.getElementById('cli-terminal');
+            clearTerminal('cli-terminal');
+
+            const output = [
+                '<span class="prompt">$</span> <span class="command">python -m agent4linux run --requirement "Full system benchmark with regression testing"</span>',
+                '',
+                '<span class="info">🔄 Full Workflow Execution</span>',
+                '<span class="info">━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━</span>',
+                '',
+                '<span class="log-line">Phase 1: Test Design</span>',
+                '<span class="log-line success">  ✓ 8 test cases designed</span>',
+                '',
+                '<span class="log-line">Phase 2: Test Execution</span>',
+                '<span class="log-line">  → Distributed across 4 workers</span>',
+                '<span class="log-line success">  ✓ All tests completed</span>',
+                '',
+                '<span class="log-line">Phase 3: Analysis</span>',
+                '<span class="log-line success">  ✓ Baseline comparison: 0 regressions</span>',
+                '<span class="log-line success">  ✓ ML anomaly detection: No anomalies</span>',
+                '',
+                '<span class="log-line">Phase 4: Reporting</span>',
+                '<span class="log-line success">  ✓ HTML report generated</span>',
+                '<span class="log-line success">  ✓ Alerts sent (Slack, Email)</span>',
+                '<span class="log-line success">  ✓ Prometheus metrics updated</span>',
+                '',
+                '<span class="success">🎉 Workflow completed successfully!</span>',
+                '<span class="prompt">$</span> <span class="cursor"></span>'
+            ];
+
+            await streamOutput(terminal, output, 120);
+        }
+
+        // Dashboard Demo
+        function refreshDashboard() {
+            // Update stats
+            document.getElementById('total-tests').textContent = testData.length;
+            if (testData.length > 0) {
+                const latest = testData[testData.length - 1];
+                document.getElementById('latest-score').textContent = latest.score.toFixed(1);
+                document.getElementById('avg-latency').textContent = (Math.random() * 30 + 40).toFixed(1) + ' μs';
+                const passRate = (testData.filter(t => t.status === 'PASS').length / testData.length * 100).toFixed(0);
+                document.getElementById('pass-rate').textContent = passRate + '%';
+            }
+
+            // Update chart
+            if (latencyChart && latencyData.length > 0) {
+                latencyChart.data.labels = latencyData.map((_, i) => `T${i+1}`);
+                latencyChart.data.datasets[0].data = latencyData;
+                latencyChart.update();
+            }
+        }
+
+        async function simulateTest() {
+            const score = Math.random() * 30 + 70;
+            const latency = Math.random() * 30 + 40;
+            const status = score > 75 ? 'PASS' : 'FAIL';
+
+            const test = {
+                id: 'test_' + Date.now(),
+                timestamp: new Date().toLocaleTimeString(),
+                status: status,
+                score: score
+            };
+
+            testData.push(test);
+            latencyData.push(latency);
+
+            // Keep only last 20
+            if (testData.length > 20) {
+                testData.shift();
+                latencyData.shift();
+            }
+
+            // Update table
+            const tbody = document.getElementById('test-results-table');
+            const row = tbody.insertRow(0);
+            row.innerHTML = `
+                <td><code>${test.id.substring(5, 13)}</code></td>
+                <td>${test.timestamp}</td>
+                <td><span class="status-indicator ${status === 'PASS' ? 'green' : 'red'}"></span>${status}</td>
+                <td>${test.score.toFixed(1)}/100</td>
+            `;
+
+            // Keep only last 10 rows
+            while (tbody.rows.length > 10) {
+                tbody.deleteRow(tbody.rows.length - 1);
+            }
+
+            refreshDashboard();
+        }
+
+        // Distributed Testing Demo
+        async function runDistributedTest() {
+            const terminal = document.getElementById('distributed-terminal');
+            const progress = document.getElementById('distributed-progress');
+            clearTerminal('distributed-terminal');
+
+            const output = [
+                '<span class="info">🌍 Distributed Test Execution</span>',
+                '<span class="info">━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━</span>',
+                '',
+                '<span class="log-line">Coordinator: Initializing...</span>',
+                '<span class="log-line success">✓ 4 workers registered</span>',
+                '',
+                '<span class="info">Worker Pool:</span>',
+                '  <span class="success">• worker-1 (test-node-1): READY</span>',
+                '  <span class="success">• worker-2 (test-node-2): READY</span>',
+                '  <span class="success">• worker-3 (test-node-3): READY</span>',
+                '  <span class="success">• worker-4 (test-node-4): READY</span>',
+                '',
+                '<span class="log-line">Distributing 16 test cases...</span>',
+            ];
+
+            await streamOutput(terminal, output, 100);
+            progress.style.width = '25%';
+
+            const distributionOutput = [
+                '<span class="log-line success">✓ Tests distributed (round-robin)</span>',
+                '',
+                '<span class="info">Executing in parallel...</span>',
+                '<span class="log-line">  worker-1: Running test 1/4...</span>',
+                '<span class="log-line">  worker-2: Running test 1/4...</span>',
+                '<span class="log-line">  worker-3: Running test 1/4...</span>',
+                '<span class="log-line">  worker-4: Running test 1/4...</span>',
+            ];
+
+            await streamOutput(terminal, distributionOutput, 150);
+            progress.style.width = '50%';
+
+            await new Promise(resolve => setTimeout(resolve, 500));
+
+            const resultsOutput = [
+                '<span class="log-line success">  ✓ worker-1: Completed (2.3s)</span>',
+                '<span class="log-line success">  ✓ worker-2: Completed (2.1s)</span>',
+                '<span class="log-line success">  ✓ worker-3: Completed (2.5s)</span>',
+                '<span class="log-line success">  ✓ worker-4: Completed (2.2s)</span>',
+                '',
+                '<span class="log-line">Aggregating results...</span>',
+                '<span class="log-line success">✓ All 16 tests completed</span>',
+                '',
+                '<span class="success">━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━</span>',
+                '<span class="info">Performance:</span>',
+                '  • Total Duration: 9.2s',
+                '  • Speedup: 10.4x (vs sequential)',
+                '  • Tests/sec: 1.74',
+                '',
+                '<span class="info">Workers:</span>',
+                '  • Total: 4',
+                '  • Avg Load: 78%',
+                '  • Peak Memory: 2.1 GB',
+                '',
+                '<span class="success">🎉 Distributed test completed!</span>',
+            ];
+
+            await streamOutput(terminal, resultsOutput, 100);
+            progress.style.width = '100%';
+        }
+
+        // ML Demo
+        async function trainMLModel() {
+            const terminal = document.getElementById('ml-terminal');
+            clearTerminal('ml-terminal');
+
+            const output = [
+                '<span class="info">🤖 Machine Learning Model Training</span>',
+                '<span class="info">━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━</span>',
+                '',
+                '<span class="log-line">Loading historical data...</span>',
+                '<span class="log-line success">✓ Loaded 1,247 samples</span>',
+                '',
+                '<span class="log-line">Training Isolation Forest...</span>',
+                '<span class="log-line">  Features: max_latency, throughput, iops</span>',
+                '<span class="log-line">  Contamination: 0.1 (10%)</span>',
+                '<span class="log-line success">  ✓ Model trained</span>',
+                '',
+                '<span class="log-line">Training Statistical Model...</span>',
+                '<span class="log-line">  Mean: 45.2 μs</span>',
+                '<span class="log-line">  Std Dev: 12.3 μs</span>',
+                '<span class="log-line">  IQR: [38.1, 52.7]</span>',
+                '<span class="log-line success">  ✓ Model trained</span>',
+                '',
+                '<span class="log-line">Training Time-Series Model...</span>',
+                '<span class="log-line">  Window: 10 samples</span>',
+                '<span class="log-line">  Moving Avg: 44.8 μs</span>',
+                '<span class="log-line success">  ✓ Model trained</span>',
+                '',
+                '<span class="log-line">Saving models...</span>',
+                '<span class="log-line success">✓ Saved to models/anomaly_detector.pkl</span>',
+                '',
+                '<span class="success">🎉 Training complete!</span>',
+                '',
+                '<span class="info">Models ready for anomaly detection.</span>',
+            ];
+
+            await streamOutput(terminal, output, 120);
+        }
+
+        async function runMLDetection() {
+            const terminal = document.getElementById('ml-terminal');
+            clearTerminal('ml-terminal');
+
+            const output = [
+                '<span class="info">🔍 Running Anomaly Detection</span>',
+                '<span class="info">━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━</span>',
+                '',
+                '<span class="log-line">Loading models...</span>',
+                '<span class="log-line success">✓ Isolation Forest loaded</span>',
+                '<span class="log-line success">✓ Statistical model loaded</span>',
+                '<span class="log-line success">✓ Time-series model loaded</span>',
+                '',
+                '<span class="log-line">Analyzing recent metrics...</span>',
+                '',
+                '<span class="info">Sample 1: max_latency = 43.2 μs</span>',
+                '<span class="log-line">  Isolation Forest: Normal (score: 0.18)</span>',
+                '<span class="log-line">  Statistical: Normal (z-score: 0.24)</span>',
+                '<span class="log-line success">  → Result: NORMAL</span>',
+                '',
+                '<span class="info">Sample 2: max_latency = 89.7 μs</span>',
+                '<span class="log-line warning">  Isolation Forest: Anomaly! (score: 0.82)</span>',
+                '<span class="log-line warning">  Statistical: Anomaly! (z-score: 3.42)</span>',
+                '<span class="log-line warning">  Time-Series: Anomaly! (deviation: 42.1)</span>',
+                '<span class="warning">  → Result: ANOMALY DETECTED ⚠️</span>',
+                '',
+                '<span class="info">Sample 3: max_latency = 47.1 μs</span>',
+                '<span class="log-line">  Isolation Forest: Normal (score: 0.22)</span>',
+                '<span class="log-line">  Statistical: Normal (z-score: 0.31)</span>',
+                '<span class="log-line success">  → Result: NORMAL</span>',
+                '',
+                '<span class="success">━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━</span>',
+                '<span class="info">Summary:</span>',
+                '  • Total Samples: 3',
+                '  • Anomalies Detected: 1',
+                '  • Detection Rate: 33.3%',
+                '  • Processing Time: 47ms',
+                '',
+                '<span class="warning">🚨 Alert: Anomaly detected in max_latency</span>',
+                '<span class="log-line">  → Notification sent to Slack</span>',
+                '<span class="log-line">  → PagerDuty incident created</span>',
+            ];
+
+            await streamOutput(terminal, output, 150);
+        }
+
+        // Helper functions
+        function clearTerminal(terminalId) {
+            isStreaming = false;
+            const terminal = document.getElementById(terminalId);
+            terminal.innerHTML = '';
+        }
+
+        // Auto-simulate some activity
+        setTimeout(() => {
+            for (let i = 0; i < 5; i++) {
+                setTimeout(() => {
+                    if (document.getElementById('dashboard-demo').classList.contains('active')) {
+                        simulateTest();
+                    }
+                }, i * 1000);
+            }
+        }, 2000);
+    </script>
+</body>
+</html>
