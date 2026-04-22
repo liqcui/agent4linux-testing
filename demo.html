@@ -251,17 +251,22 @@
 
         .chart-container {
             background: white;
-            padding: 1.5rem;
+            padding: 1rem;
             border-radius: 8px;
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
             margin-bottom: 1.5rem;
         }
 
         .chart-title {
-            font-size: 1.1rem;
+            font-size: 1rem;
             font-weight: 600;
-            margin-bottom: 1rem;
+            margin-bottom: 0.75rem;
             color: #333;
+        }
+
+        #latencyChart {
+            height: 200px !important;
+            max-height: 200px;
         }
 
         .controls {
@@ -1094,7 +1099,19 @@ Click "Train Model" to begin or "Detect Anomalies" to test...</span>
 
         function initializeCharts() {
             const ctx = document.getElementById('latencyChart');
-            if (ctx && !latencyChart) {
+            if (!ctx) {
+                console.log('Chart canvas not found');
+                return;
+            }
+
+            // Destroy existing chart if it exists
+            if (latencyChart) {
+                latencyChart.destroy();
+                latencyChart = null;
+            }
+
+            // Create new chart
+            try {
                 latencyChart = new Chart(ctx, {
                     type: 'line',
                     data: {
@@ -1105,7 +1122,9 @@ Click "Train Model" to begin or "Detect Anomalies" to test...</span>
                             borderColor: '#667eea',
                             backgroundColor: 'rgba(102, 126, 234, 0.1)',
                             tension: 0.4,
-                            fill: true
+                            fill: true,
+                            pointRadius: 3,
+                            pointHoverRadius: 5
                         }]
                     },
                     options: {
@@ -1115,10 +1134,23 @@ Click "Train Model" to begin or "Detect Anomalies" to test...</span>
                             legend: { display: false }
                         },
                         scales: {
-                            y: { beginAtZero: true }
+                            y: {
+                                beginAtZero: true,
+                                ticks: {
+                                    font: { size: 11 }
+                                }
+                            },
+                            x: {
+                                ticks: {
+                                    font: { size: 11 }
+                                }
+                            }
                         }
                     }
                 });
+                console.log('Chart initialized successfully');
+            } catch (error) {
+                console.error('Error initializing chart:', error);
             }
         }
 
@@ -1127,8 +1159,25 @@ Click "Train Model" to begin or "Detect Anomalies" to test...</span>
             document.querySelectorAll('.demo-tab').forEach(tab => tab.classList.remove('active'));
             document.querySelectorAll('.demo-content').forEach(content => content.classList.remove('active'));
 
-            event.target.classList.add('active');
-            document.getElementById(demoType + '-demo').classList.add('active');
+            // Find and activate the clicked tab
+            const tabs = document.querySelectorAll('.demo-tab');
+            tabs.forEach((tab, index) => {
+                if (tab.textContent.toLowerCase().includes(demoType)) {
+                    tab.classList.add('active');
+                }
+            });
+
+            const demoElement = document.getElementById(demoType + '-demo');
+            if (demoElement) {
+                demoElement.classList.add('active');
+            }
+
+            // Initialize chart when dashboard tab is shown
+            if (demoType === 'dashboard') {
+                setTimeout(() => {
+                    initializeCharts();
+                }, 100);
+            }
         }
 
         // Streaming output helper
@@ -1255,16 +1304,34 @@ Click "Train Model" to begin or "Detect Anomalies" to test...</span>
         // Dashboard Demo
         function refreshDashboard() {
             // Update stats
-            document.getElementById('total-tests').textContent = testData.length;
+            const totalTestsEl = document.getElementById('total-tests');
+            if (totalTestsEl) {
+                totalTestsEl.textContent = testData.length;
+            }
+
             if (testData.length > 0) {
                 const latest = testData[testData.length - 1];
-                document.getElementById('latest-score').textContent = latest.score.toFixed(1);
-                document.getElementById('avg-latency').textContent = (Math.random() * 30 + 40).toFixed(1) + ' μs';
-                const passRate = (testData.filter(t => t.status === 'PASS').length / testData.length * 100).toFixed(0);
-                document.getElementById('pass-rate').textContent = passRate + '%';
+                const latestScoreEl = document.getElementById('latest-score');
+                const avgLatencyEl = document.getElementById('avg-latency');
+                const passRateEl = document.getElementById('pass-rate');
+
+                if (latestScoreEl) {
+                    latestScoreEl.textContent = latest.score.toFixed(1);
+                }
+                if (avgLatencyEl) {
+                    avgLatencyEl.textContent = (Math.random() * 30 + 40).toFixed(1) + ' μs';
+                }
+                if (passRateEl) {
+                    const passRate = (testData.filter(t => t.status === 'PASS').length / testData.length * 100).toFixed(0);
+                    passRateEl.textContent = passRate + '%';
+                }
             }
 
             // Update chart
+            if (!latencyChart) {
+                initializeCharts();
+            }
+
             if (latencyChart && latencyData.length > 0) {
                 latencyChart.data.labels = latencyData.map((_, i) => `T${i+1}`);
                 latencyChart.data.datasets[0].data = latencyData;

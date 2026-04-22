@@ -2,6 +2,8 @@
 
 An intelligent AI agent for Linux testing automation - designs test cases, executes tests, and analyzes results.
 
+**🌐 [Live Demo](https://liqcui.github.io/)** | Interactive demonstration with system architecture, CLI simulation, web dashboard, and ML features
+
 ## Overview
 
 Agent4Linux-Testing is an AI-powered testing assistant that helps you:
@@ -66,6 +68,21 @@ agent4linux-testing/
 ├── examples/              # Usage examples
 └── docs/                  # Documentation
 ```
+
+## 🎯 Interactive Demo
+
+Experience the full capabilities of Agent4Linux-Testing through our interactive demo:
+
+**👉 [https://liqcui.github.io/](https://liqcui.github.io/)**
+
+The demo includes:
+- **System Architecture Topology**: Interactive 5-layer visualization with clickable components
+- **CLI Demo**: Streaming terminal output showing test execution
+- **Web Dashboard**: Real-time charts and metrics visualization
+- **Distributed Testing**: Multi-worker test coordination simulation
+- **ML Anomaly Detection**: Machine learning model training and detection
+
+All demos run entirely in your browser with no backend required!
 
 ## Quick Start
 
